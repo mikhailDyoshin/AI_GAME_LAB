@@ -12,40 +12,41 @@ var target_position: Vector2 = Vector2.ZERO
 func _ready():
 	target_position = global_position
 
-
 func _input(event):
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
 		target_position = get_global_mouse_position()
 
 func _physics_process(delta):
-	# Calculate the distance to the target
 	var distance_to_target = global_position.distance_to(target_position)
 	
-	
-	
 	if distance_to_target < STOP_RADIUS:
-		velocity = Vector2.ZERO
-		global_position = target_position
+		stop()
 		return
 	
-	# Only move if the character is not already at the target position
+	steer(distance_to_target)
+	
+	if velocity.length() > 1.0:
+		rotate_character()
+		
+	move_and_slide()
+
+func stop():
+	velocity = Vector2.ZERO
+	global_position = target_position
+	
+func steer(distance_to_target: float):
 	var direction = (target_position - global_position).normalized()
 	var target_speed = SPEED
 	
 	if distance_to_target < SLOWING_RADIUS:
 		var speed_factor = distance_to_target / SLOWING_RADIUS
 		target_speed = SPEED * speed_factor
-	
-	
-	if velocity.length() > 1.0:
-		var target_angle = velocity.angle() - PI/2
-		rotation = lerp_angle(rotation, target_angle, 0.1)
 		
-	
-
 	var desired_velocity = direction * target_speed
 	var steering_force = desired_velocity - velocity
 	steering_force = steering_force.limit_length(MAX_FORCE)
 	velocity += steering_force
-
-	move_and_slide()
+	
+func rotate_character():
+	var target_angle = velocity.angle() - PI/2
+	rotation = lerp_angle(rotation, target_angle, 0.1)
