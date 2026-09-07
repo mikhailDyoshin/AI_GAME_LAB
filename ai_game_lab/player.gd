@@ -21,6 +21,8 @@ func _physics_process(delta):
 	# Calculate the distance to the target
 	var distance_to_target = global_position.distance_to(target_position)
 	
+	
+	
 	if distance_to_target < STOP_RADIUS:
 		velocity = Vector2.ZERO
 		global_position = target_position
@@ -33,6 +35,12 @@ func _physics_process(delta):
 	if distance_to_target < SLOWING_RADIUS:
 		var speed_factor = distance_to_target / SLOWING_RADIUS
 		target_speed = SPEED * speed_factor
+	
+	
+	if velocity.length() > 1.0:
+		var target_angle = velocity.angle() - PI/2
+		rotation = lerp_angle(rotation, target_angle, 0.1)
+		
 	
 
 	var desired_velocity = direction * target_speed
