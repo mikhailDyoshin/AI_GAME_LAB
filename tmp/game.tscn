@@ -1,0 +1,28 @@
+[gd_scene format=4 uid="uid://b2u37tns8r5dp"]
+
+[ext_resource type="PackedScene" uid="uid://b8lth0l2dy3ab" path="res://enemy.tscn" id="1_e2o6t"]
+[ext_resource type="PackedScene" uid="uid://bc4714yuk5fq0" path="res://player.tscn" id="2_feb5d"]
+[ext_resource type="Texture2D" uid="uid://chhd3woaoa0q2" path="res://fence.svg" id="3_feb5d"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_feb5d"]
+texture = ExtResource("3_feb5d")
+texture_region_size = Vector2i(128, 128)
+0:0/0 = 0
+0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-64, -64, 64, -64, 64, 64, -64, 64)
+
+[sub_resource type="TileSet" id="TileSet_oj858"]
+tile_size = Vector2i(128, 128)
+physics_layer_0/collision_layer = 1
+sources/3 = SubResource("TileSetAtlasSource_feb5d")
+
+[node name="StupidEnemyAI" type="Node2D" unique_id=1243794094]
+
+[node name="Enemy" parent="." unique_id=1653876978 instance=ExtResource("1_e2o6t")]
+speed = 100
+
+[node name="Player" parent="." unique_id=1361966195 groups=["player"] instance=ExtResource("2_feb5d")]
+position = Vector2(-251, 230)
+
+[node name="TileMapLayer" type="TileMapLayer" parent="." unique_id=1261642291]
+tile_map_data = PackedByteArray("AAD8/wAAAwAAAAAAAAD4/wAAAwAAAAAAAAD4////AwAAAAAAAAD4//7/AwAAAAAAAAD4//3/AwAAAAAAAAD4//z/AwAAAAAAAAD4//v/AwAAAAAAAAD5//v/AwAAAAAAAAD6//v/AwAAAAAAAAD7//v/AwAAAAAAAAD8//v/AwAAAAAAAAD9//v/AwAAAAAAAAD+//v/AwAAAAAAAAD///v/AwAAAAAAAAAAAPv/AwAAAAAAAAABAPv/AwAAAAAAAAACAPv/AwAAAAAAAAADAPv/AwAAAAAAAAADAPz/AwAAAAAAAAADAP3/AwAAAAAAAAADAP7/AwAAAAAAAAADAP//AwAAAAAAAAADAAAAAwAAAAAAAAADAAEAAwAAAAAAAAADAAIAAwAAAAAAAAADAAMAAwAAAAAAAAADAAQAAwAAAAAAAAADAAUAAwAAAAAAAAADAAYAAwAAAAAAAAD3/wAAAwAAAAAAAAD2/wAAAwAAAAAAAAD1/wAAAwAAAAAAAAD0/wAAAwAAAAAAAADz/wAAAwAAAAAAAADy/wAAAwAAAAAAAADx/wAAAwAAAAAAAADx/wEAAwAAAAAAAADx/wIAAwAAAAAAAADx/wMAAwAAAAAAAADx/wQAAwAAAAAAAADx/wUAAwAAAAAAAADy/wYAAwAAAAAAAADx/wYAAwAAAAAAAADz/wYAAwAAAAAAAAD0/wYAAwAAAAAAAAD1/wYAAwAAAAAAAAD2/wYAAwAAAAAAAAD3/wYAAwAAAAAAAAD4/wYAAwAAAAAAAAD5/wYAAwAAAAAAAAD5/wUAAwAAAAAAAAD6/wUAAwAAAAAAAAD7/wUAAwAAAAAAAAD8/wUAAwAAAAAAAAD8/wYAAwAAAAAAAAD9/wYAAwAAAAAAAAD+/wYAAwAAAAAAAAD//wYAAwAAAAAAAAAAAAYAAwAAAAAAAAABAAYAAwAAAAAAAAACAAYAAwAAAAAAAAA=")
+tile_set = SubResource("TileSet_oj858")
