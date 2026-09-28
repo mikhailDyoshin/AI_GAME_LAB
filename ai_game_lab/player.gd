@@ -10,7 +10,7 @@ var target_position: Vector2 = Vector2.ZERO
 
 @onready var file = FileAccess.open("user://game_logs.txt", FileAccess.WRITE)
 
-var kinematic_arrive: KinematicArrive = KinematicArrive.new()
+var kinematic_arrive: KinematicMovement = KinematicSeek.new()
 
 func _ready():
 	target_position = global_position
