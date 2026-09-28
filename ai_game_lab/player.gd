@@ -1,14 +1,16 @@
 extends CharacterBody2D
 
 
-@export var SPEED = 60.0
-@export var MAX_FORCE = 60.0
-@export var SLOWING_RADIUS = 100
-@export var STOP_RADIUS = 0.05
+@export var max_speed = 600.0
+@export var max_force = 60.0
+@export var slowing_radius = 100
+@export var stop_radius = 0.1
 
 var target_position: Vector2 = Vector2.ZERO
 
 @onready var file = FileAccess.open("user://game_logs.txt", FileAccess.WRITE)
+
+var kinematic_arrive: KinematicArrive = KinematicArrive.new()
 
 func _ready():
 	target_position = global_position
@@ -18,66 +20,15 @@ func _input(event):
 		target_position = get_global_mouse_position()
 
 func _physics_process(delta):
-	var distance_to_target = global_position.distance_to(target_position)
-	
-	if distance_to_target < STOP_RADIUS:
-		stop()
-		return
-	
-	#steer(distance_to_target)
-	wander(distance_to_target)
-	
-	if velocity.length() > 1.0:
-		rotate_character()
-		
+	apply_kinematics(kinematic_arrive.calculate(self))
 	move_and_slide()
 
-func stop():
-	velocity = Vector2.ZERO
-	global_position = target_position
-	file.close()
-	
-func steer(distance_to_target: float):
-	file = FileAccess.open("user://game_logs.txt", FileAccess.READ_WRITE)
-	
-	var direction = (target_position - global_position).normalized()
-	var target_speed = SPEED
-	
-	if distance_to_target < SLOWING_RADIUS:
-		var speed_factor = distance_to_target / SLOWING_RADIUS
-		target_speed = SPEED * speed_factor
-		
-	var desired_velocity = direction * target_speed
-	var steering_force = desired_velocity - velocity
-	steering_force = steering_force.limit_length(MAX_FORCE)
-	velocity += steering_force
-	
-	
-	var data = {
-		"velocity": velocity.length(), 
-		"force": steering_force.length(), 
-		"distance_to_target": distance_to_target,
-		"direction": {"x": direction.x, "y": direction.y}
-	}
-	
-	save_text_log(JSON.stringify(data))
-	
-func rotate_character():
-	var target_angle = velocity.angle() - PI/2
-	rotation = lerp_angle(rotation, target_angle, 0.1)
-	
+func apply_kinematics(kinemtic_steering_output: KinematicSteeringOutput):
+	velocity = kinemtic_steering_output.velocity
+	rotation = kinemtic_steering_output.rotation
 
 func random_binomial():
 	return randf() - randf()
-
-func wander(distance_to_target: float):
-	steer(distance_to_target)
-	var target_angle = velocity.angle()
-	rotation = lerp_angle(rotation, target_angle, 0.1)
-	velocity = velocity.rotated(rotation)
-	
-	
-
 
 func save_text_log(message: String):
 	if file:
@@ -85,3 +36,16 @@ func save_text_log(message: String):
 		file.store_line(message)
 	else:
 		print("Ошибка открытия файла: ", FileAccess.get_open_error())
+
+
+#func log_steering():
+	#file = FileAccess.open("user://game_logs.txt", FileAccess.READ_WRITE)
+#
+	#var data = {
+		#"velocity": velocity.length(), 
+		#"force": steering_force().length(), 
+		#"distance_to_target": distance_to_target(),
+		#"direction": {"x": direction().x, "y": direction().y}
+	#}
+	#
+	#save_text_log(JSON.stringify(data))
