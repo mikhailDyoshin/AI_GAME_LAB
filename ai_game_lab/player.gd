@@ -10,7 +10,6 @@ var target_position: Vector2 = Vector2.ZERO
 
 @onready var file = FileAccess.open("user://game_logs.txt", FileAccess.WRITE)
 
-var kinematic_arrive: KinematicMovement = KinematicSeek.new()
 
 func _ready():
 	target_position = global_position
@@ -20,7 +19,7 @@ func _input(event):
 		target_position = get_global_mouse_position()
 
 func _physics_process(delta):
-	apply_kinematics(kinematic_arrive.calculate(self))
+	apply_kinematics(KinematicMovement.arrive(_get_context()))
 	move_and_slide()
 
 func apply_kinematics(kinemtic_steering_output: KinematicSteeringOutput):
@@ -37,6 +36,23 @@ func save_text_log(message: String):
 	else:
 		print("Ошибка открытия файла: ", FileAccess.get_open_error())
 
+func _get_context() -> KinematicContext:
+	var offset: Vector2 = target_position - global_position
+	var current_distance: float = offset.length()
+	var current_direction: Vector2 = offset.normalized() if current_distance > 0.0 else Vector2.ZERO
+	
+	return KinematicContext.new(
+		self,
+		velocity,
+		rotation,
+		max_speed,
+		max_force,
+		target_position,
+		current_direction,
+		current_distance,
+		stop_radius,
+		slowing_radius
+	)
 
 #func log_steering():
 	#file = FileAccess.open("user://game_logs.txt", FileAccess.READ_WRITE)
