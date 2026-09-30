@@ -93,16 +93,27 @@ static func arrive(context: KinematicContext) -> KinematicSteeringOutput:
 
 
 static func flee(context: KinematicContext) -> KinematicSteeringOutput:
-	return calculate_movement(context, [], [away_from_target], [limit_velocity_change], [smooth_rotation])
+	return calculate_movement(context, [flee_slow_down, flee_stop], [away_from_target], [limit_velocity_change], [smooth_rotation])
 
 
 static func wander(context: KinematicContext) -> KinematicSteeringOutput:
-	return calculate_movement(context, [slow_down, stop_at_radius], [wandering_direction], [limit_velocity_change], [smooth_rotation])
+	return calculate_movement(context, [], [wandering_direction], [limit_velocity_change], [smooth_rotation])
 
 
 static func align(context: KinematicContext) -> KinematicSteeringOutput:
 	return calculate_movement(context, [stay], [], [], [smooth_rotation], face_target)
+	
 
+static func chaotic(context: KinematicContext) -> KinematicSteeringOutput:
+	return calculate_movement(context, [chaotic_speed], [chaotic_direction], [limit_velocity_change], [smooth_rotation])
+
+
+static func chaotic_direction(direction: Vector2, _context: KinematicContext) -> Vector2:
+	var max_spread_deg := 360.0
+	var max_spread_rad := deg_to_rad(max_spread_deg)
+	var random_angle := randf_range(0, max_spread_rad)
+	return direction.rotated(random_angle)
+	
 
 static func wandering_direction(direction: Vector2, _context: KinematicContext) -> Vector2:
 	var max_spread_deg := 180.0
@@ -130,6 +141,22 @@ static func slow_down(speed: float, context: KinematicContext) -> float:
 		
 	return speed
 	
+static func flee_slow_down(speed: float, context: KinematicContext) -> float:
+	var distance = context.distance
+	var flee_radius = context.flee_radius
+	if distance > flee_radius:
+		speed *= flee_radius/distance
+		return speed
+	
+	return speed
+		
+static func chaotic_speed(speed: float, _context: KinematicContext) -> float:
+	return randf_range(0, speed)		
+
+static func flee_stop(speed: float, context: KinematicContext) -> float:
+	if context.distance > context.flee_stop_radius:
+		return 0
+	return speed
 
 static func stay(_speed: float, _context: KinematicContext) -> float:
 	return 0

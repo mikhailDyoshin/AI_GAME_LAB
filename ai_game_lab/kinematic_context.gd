@@ -11,6 +11,8 @@ var direction: Vector2
 var distance: float
 var stop_radius: float
 var slowing_radius: float
+var flee_radius: float
+var flee_stop_radius: float
 
 func _init(
 	_agent: CharacterBody2D = null,
@@ -22,7 +24,9 @@ func _init(
 	_direction: Vector2 = Vector2.ZERO,
 	_distance: float = 0.0,
 	_stop_radius: float = 0.0,
-	_slowing_radius: float = 0.0
+	_slowing_radius: float = 0.0,
+	_flee_radius: float = 0.0,
+	_flee_stop_radius: float = 0.0
 ) -> void:
 	agent = _agent
 	velocity = _velocity
@@ -34,3 +38,5 @@ func _init(
 	distance = _distance
 	stop_radius = _stop_radius
 	slowing_radius = _slowing_radius
+	flee_radius = _flee_radius
+	flee_stop_radius = _flee_stop_radius

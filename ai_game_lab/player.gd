@@ -5,6 +5,9 @@ extends CharacterBody2D
 @export var max_force = 60.0
 @export var slowing_radius = 100
 @export var stop_radius = 0.1
+@export var flee_radius = 400.0
+@export var flee_stop_radius = 600.0
+@export var world_size := Vector2(1152, 648) 
 
 var target_position: Vector2 = Vector2.ZERO
 
@@ -17,10 +20,17 @@ func _ready():
 func _input(event):
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
 		target_position = get_global_mouse_position()
+		
+func _process(delta: float) -> void:
+	if Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT):
+		target_position = get_global_mouse_position()
 
 func _physics_process(delta):
-	apply_kinematics(KinematicMovement.arrive(_get_context()))
+	apply_kinematics(KinematicMovement.flee(_get_context()))
 	move_and_slide()
+	
+	global_position.x = fposmod(global_position.x, world_size.x)
+	global_position.y = fposmod(global_position.y, world_size.y)
 
 func apply_kinematics(kinemtic_steering_output: KinematicSteeringOutput):
 	velocity = kinemtic_steering_output.velocity
@@ -51,7 +61,9 @@ func _get_context() -> KinematicContext:
 		current_direction,
 		current_distance,
 		stop_radius,
-		slowing_radius
+		slowing_radius,
+		flee_radius,
+		flee_stop_radius,
 	)
 
 #func log_steering():
