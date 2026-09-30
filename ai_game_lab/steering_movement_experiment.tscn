@@ -3,8 +3,9 @@
 [ext_resource type="Script" uid="uid://nqw16162k1dx" path="res://player.gd" id="1_01duc"]
 [ext_resource type="Texture2D" uid="uid://cm5wr4eu13ys0" path="res://map-pin.svg" id="2_01duc"]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_dgfsc"]
-size = Vector2(115, 111)
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_01duc"]
+radius = 14.5
+height = 41.0
 
 [node name="Steering_Movement_Experiment" type="Node" unique_id=1400567332]
 
@@ -13,8 +14,10 @@ position = Vector2(575, 310)
 script = ExtResource("1_01duc")
 
 [node name="PlayerCollisionShape2D" type="CollisionShape2D" parent="Player" unique_id=85295463]
-position = Vector2(0.5, 0.5)
-shape = SubResource("RectangleShape2D_dgfsc")
+position = Vector2(-1, 0)
+rotation = -1.5707964
+shape = SubResource("CapsuleShape2D_01duc")
 
 [node name="PlayerSprite2D" type="Sprite2D" parent="Player" unique_id=889508719]
+rotation = -1.5707964
 texture = ExtResource("2_01duc")

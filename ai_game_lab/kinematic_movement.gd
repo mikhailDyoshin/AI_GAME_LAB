@@ -100,6 +100,10 @@ static func wander(context: KinematicContext) -> KinematicSteeringOutput:
 	return calculate_movement(context, [slow_down, stop_at_radius], [wandering_direction], [limit_velocity_change], [smooth_rotation])
 
 
+static func align(context: KinematicContext) -> KinematicSteeringOutput:
+	return calculate_movement(context, [stay], [], [], [smooth_rotation], face_target)
+
+
 static func wandering_direction(direction: Vector2, _context: KinematicContext) -> Vector2:
 	var max_spread_deg := 180.0
 	var max_spread_rad := deg_to_rad(max_spread_deg)
@@ -126,6 +130,10 @@ static func slow_down(speed: float, context: KinematicContext) -> float:
 		
 	return speed
 	
+
+static func stay(_speed: float, _context: KinematicContext) -> float:
+	return 0
+
 	
 static func stop_at_radius(speed: float, context: KinematicContext) -> float:
 	if context.distance < context.stop_radius:
@@ -135,7 +143,10 @@ static func stop_at_radius(speed: float, context: KinematicContext) -> float:
 static func face_velocity(velocity: Vector2, context: KinematicContext) -> float:
 	if velocity.length_squared() < 2.0:
 		return context.rotation
-	return velocity.angle()  - PI / 2
+	return velocity.angle()
+	
+static func face_target(_velocity: Vector2, context: KinematicContext) -> float:
+	return context.direction.angle()
 
 static func smooth_rotation(rotation: float, context: KinematicContext) -> float:
 	var target_angle := rotation
