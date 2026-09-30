@@ -2,20 +2,18 @@ extends KinematicMovement
 
 class_name KinematicArrive
 
-func calculate(agent: CharacterBody2D) -> KinematicSteeringOutput:
-	var offset = agent.target_position - agent.global_position
-	var distance = offset.length()
-	var direction = offset.normalized()
+func _arrive_speed_policy(agent) -> float:
+	var distance = _get_distance_to_target(agent)
 	var speed = agent.max_speed
-
+	
 	if distance < agent.stop_radius:
-		return KinematicSteeringOutput.new(Vector2.ZERO, agent.rotation)
+		return 0
 
 	if distance < agent.slowing_radius:
 		speed *= distance / agent.slowing_radius
+		return speed
+		
+	return speed
 
-	var desired_velocity = direction * speed
-	var velocity = _calculate_velocity(agent, desired_velocity)
-	var rotation = _calculate_rotation(agent, velocity)
-	
-	return KinematicSteeringOutput.new(velocity,rotation)
+func calculate(agent: CharacterBody2D) -> KinematicSteeringOutput:
+	return _calculate_steering_output(agent, _arrive_speed_policy)
