@@ -13,20 +13,35 @@ var target_position: Vector2 = Vector2.ZERO
 
 @onready var file = FileAccess.open("user://game_logs.txt", FileAccess.WRITE)
 
+var movements = [
+	MovementType.new("Arrive", KinematicMovement.arrive), 
+	MovementType.new("Chaotic", KinematicMovement.chaotic),
+	MovementType.new("Align", KinematicMovement.align),
+	MovementType.new("Seek", KinematicMovement.seek),
+	MovementType.new("Flee", KinematicMovement.flee),
+	MovementType.new("Wander", KinematicMovement.wander)
+]
+var current_index = 0
+var current_movement = movements[0]
 
 func _ready():
 	target_position = global_position
+	print(current_movement.name)
 
 func _input(event):
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
 		target_position = get_global_mouse_position()
+		
+	if event is InputEventKey and event.pressed and not event.is_echo():
+		if event.keycode == KEY_SPACE:
+			switch_movement()
 		
 func _process(delta: float) -> void:
 	if Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT):
 		target_position = get_global_mouse_position()
 
 func _physics_process(delta):
-	apply_kinematics(KinematicMovement.flee(_get_context()))
+	apply_kinematics(current_movement.function.call(_get_context()))
 	move_and_slide()
 	
 	global_position.x = fposmod(global_position.x, world_size.x)
@@ -35,9 +50,6 @@ func _physics_process(delta):
 func apply_kinematics(kinemtic_steering_output: KinematicSteeringOutput):
 	velocity = kinemtic_steering_output.velocity
 	rotation = kinemtic_steering_output.rotation
-
-func random_binomial():
-	return randf() - randf()
 
 func save_text_log(message: String):
 	if file:
@@ -77,3 +89,14 @@ func _get_context() -> KinematicContext:
 	#}
 	#
 	#save_text_log(JSON.stringify(data))
+
+func get_next_cyclic_index(current_index: int, array_size: int) -> int:
+	if array_size == 0:
+		return 0
+	return (current_index + 1) % array_size
+
+func switch_movement():
+	current_index = get_next_cyclic_index(current_index, movements.size())
+	current_movement = movements[current_index]
+	print(current_movement.name)
+	
