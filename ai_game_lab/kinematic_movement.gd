@@ -83,6 +83,37 @@ static func rotation_pipeline(
 
 	return rotation
 
+static func predict_target_position(context: KinematicContext) -> KinematicContext:
+	var prediciton_time = calculate_prediction_time(context)
+	var predicted_target_position = calculate_target_position(prediciton_time, context)
+	EventBus.value_updated.emit(predicted_target_position)
+	context.update_target(predicted_target_position)
+	return context
+
+static func calculate_prediction_time(context: KinematicContext) -> float:
+	var speed = context.velocity.length()
+	var max_prediction_time = context.max_prediction_time
+	var distance = context.distance
+	
+	if speed <= distance / max_prediction_time:
+		return max_prediction_time
+	
+	return 0.5 * distance/speed
+	
+	
+static func calculate_target_position(prediction_time: float, context: KinematicContext) -> Vector2:
+	return context.target_position + context.target_velocity * prediction_time
+
+
+static func evade(context: KinematicContext) -> KinematicSteeringOutput:
+	var new_context = predict_target_position(context)
+	return flee(new_context)
+
+
+static func pursue(context: KinematicContext) -> KinematicSteeringOutput:
+	var new_context = predict_target_position(context)
+	return arrive(new_context)
+
 
 static func seek(context: KinematicContext) -> KinematicSteeringOutput:
 	return calculate_movement(context, [], [], [limit_velocity_change], [smooth_rotation])
@@ -93,7 +124,7 @@ static func arrive(context: KinematicContext) -> KinematicSteeringOutput:
 
 
 static func flee(context: KinematicContext) -> KinematicSteeringOutput:
-	return calculate_movement(context, [flee_slow_down, flee_stop], [away_from_target], [limit_velocity_change], [smooth_rotation])
+	return calculate_movement(context, [], [away_from_target], [limit_velocity_change], [smooth_rotation])
 
 
 static func wander(context: KinematicContext) -> KinematicSteeringOutput:
@@ -130,7 +161,7 @@ static func away_from_target(direction: Vector2, _context: KinematicContext) -> 
 
 
 static func limit_velocity_change(desired_velocity: Vector2, context: KinematicContext) -> Vector2:
-	return context.velocity + (desired_velocity - context.velocity).limit_length(context.max_force)
+	return context.velocity + (desired_velocity - context.velocity).limit_length(context.max_speed_change)
 
 static func slow_down(speed: float, context: KinematicContext) -> float:
 	var distance = context.distance
